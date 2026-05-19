@@ -1,13 +1,13 @@
 ARG python_version=3.8
+FROM python:${python_version} AS builder
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
 FROM python:${python_version}
 WORKDIR /app
-# Спочатку копіюємо requirements.txt
-COPY requirements.txt .
-# Встановлюємо залежності
-RUN pip install -r requirements.txt
-# Копіюємо код проекту
+COPY --from=builder /install /usr/local
 COPY . .
-# Тепер можна мігрувати
 RUN python manage.py migrate
 ENV PYTHONUNBUFFERED=1
 EXPOSE 8080
